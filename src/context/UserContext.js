@@ -3,7 +3,7 @@ const Context = createContext();
 
 export function UserContextProvider({ children }) {
   const [jwt, setJwt] = useState(null);
-  const [reg, setReg] = useState(null);
+  const [reg, setReg] = useState(false);
 
   return (
     <Context.Provider value={[jwt, setJwt, reg, setReg]}>

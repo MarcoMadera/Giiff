@@ -2,7 +2,8 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const User = require("./model/user");
-
+const cors = require("cors");
+const accessTokenSecret = "my_secret_key";
 mongoose
   .connect("mongodb://localhost:27017/login", {
     useNewUrlParser: true,
@@ -11,30 +12,49 @@ mongoose
   .catch(() => console.log("Error to connect to db"));
 const app = express();
 app.use(express.json());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+  })
+);
 
 function ensureToken(req, res, next) {
-  const bearerHeader = req.headers["authorization"];
-  if (typeof bearerHeader !== "undefined") {
-    const bearer = bearerHeader.split(" ");
-    const bearerToken = bearer[1];
-    req.token = bearerToken;
+  const { authorization } = req.headers;
+  if (authorization) {
+    const token = authorization.split(" ")[1];
+    jwt.verify(token, accessTokenSecret, (err, user) => {
+      if (err) {
+        return res.sendStatus(403);
+      }
+      console.log(user);
+      req.user = user;
+      next();
+    });
     next();
   } else {
     res.sendStatus(403);
   }
 }
 
-app.post("/login", (req, res) => {
-  // Auth
-  const user = { id: 1 };
-  const token = jwt.sign({ user }, "my_secret_key");
-  res.json({
-    token: token,
+app.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+  const [_id] = await User.find({
+    username,
+    password,
   });
+
+  if (_id) {
+    const token = jwt.sign({ _id }, accessTokenSecret);
+    res.json({
+      token: token,
+    });
+  } else {
+    res.sendStatus(403);
+  }
 });
 
 app.get("/protected", ensureToken, (req, res) => {
-  jwt.verify(req.token, "my_secret_key", (err, data) => {
+  jwt.verify(req.token, accessTokenSecret, (err, data) => {
     if (err) {
       res.sendStatus(403);
     } else {
@@ -50,16 +70,13 @@ app.get("/protected", ensureToken, (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
-  console.log("req", req.body);
   try {
     const { username, password } = req.body;
     const response = await User.create({
       username,
       password,
     });
-    res.json({
-      created: true,
-    });
+    res.sendStatus(201);
     console.log("User created succesfully", response);
   } catch (err) {
     res.sendStatus(500);

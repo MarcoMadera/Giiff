@@ -15,7 +15,7 @@ export default function Login() {
 
   function handleSubmit(e) {
     e.preventDefault();
-    login();
+    login(username, password);
   }
   return (
     <form onSubmit={handleSubmit}>

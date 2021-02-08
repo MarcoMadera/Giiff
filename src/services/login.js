@@ -1,10 +1,11 @@
 const ENDPOINT = "http://localhost:8000";
 
-export default function login({ username, password }) {
+export default function login(username, password) {
   return fetch(`${ENDPOINT}/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      authorization: "Bearer: my_secret_key",
     },
     body: JSON.stringify({ username, password }),
   })
@@ -15,7 +16,7 @@ export default function login({ username, password }) {
       return res.json();
     })
     .then((res) => {
-      const { jwt } = res;
-      return jwt;
+      const { token } = res;
+      return token;
     });
 }

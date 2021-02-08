@@ -1,10 +1,11 @@
 import { useContext, useCallback } from "react";
-import Context from "../context/UserContext";
+import UserContext from "../context/UserContext";
 import loginService from "../services/login";
 import registerService from "../services/register";
 
 export default function useUser() {
-  const [jwt, setJwt, setReg] = useContext(Context);
+  const [jwt, setJwt] = useContext(UserContext);
+  const setReg = useContext(UserContext)[3];
   const login = useCallback(
     (username, password) => {
       loginService(username, password)
@@ -16,7 +17,9 @@ export default function useUser() {
   const register = useCallback(
     (username, password) => {
       registerService(username, password)
-        .then(setReg)
+        .then((res) => {
+          if (res.status === 201) setReg(true);
+        })
         .catch((e) => console.error(e));
     },
     [setReg]

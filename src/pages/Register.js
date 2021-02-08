@@ -1,22 +1,23 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useLocation } from "wouter";
 import useUser from "../hooks/useUser";
-
+import UserContext from "../context/UserContext";
 export default function Register() {
   const [username, setUserName] = useState();
   const [password, setPassword] = useState();
   const setLocation = useLocation()[1];
-  const { register, isRegister } = useUser();
+  const { register } = useUser();
+  const reg = useContext(UserContext)[2];
 
   useEffect(() => {
-    if (isRegister) {
+    if (reg) {
       setLocation("/login");
     }
-  }, [isRegister, setLocation]);
+  }, [reg, setLocation]);
 
   function handleSubmit(e) {
     e.preventDefault();
-    register();
+    register(username, password);
   }
   return (
     <form onSubmit={handleSubmit}>

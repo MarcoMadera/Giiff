@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Details from "./pages/Details";
 import SearchList from "./pages/SearchList";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import { Route } from "wouter";
 import Logo from "./assets/Logo";
 import { useLocation, Link } from "wouter";
@@ -47,6 +48,7 @@ export default function App() {
           <Route path="/search/:query" component={SearchList} />
           <Route path="/details/:id" component={Details} />
           <Route path="/login" component={Login} />
+          <Route path="/register" component={Register} />
         </Container>
       </UserContextProvider>
     </>
@@ -55,7 +57,6 @@ export default function App() {
 
 const Container = styled.div`
   margin: 0 auto;
-  max-width: 1300px;
   text-align: center;
 `;
 
